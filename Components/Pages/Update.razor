@@ -1,0 +1,97 @@
+﻿@page "/update"
+
+
+@inject DBService DBService;
+
+<h3>Update</h3>
+
+<select @onchange="OnUserSelected">
+    <option value="">Select user</option>
+    @foreach (var user in users)
+    {
+        <option value="@user.Id">@($"{user.FirstName} {user.LastName}")</option>
+    }
+</select>
+
+@if (selectedUser != null){
+
+    <EditForm Model="@selectedUser" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="container mt-4">
+            <div class="row">
+                <div class="form-group">
+                    <label for="email">E-mail address:</label>
+                    <InputText id="email" type="email" required placeholder="Update email"
+                               class="form-control" @bind-Value="selectedUser.Email" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <InputText id="password" type="password" required placeholder="Update password"
+                               class="form-control" @bind-Value="selectedUser.Password" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="password">First Name:</label>
+                    <InputText id="fname" type="text" required placeholder="Update first name"
+                               class="form-control" @bind-Value="selectedUser.FirstName" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Last Name:</label>
+                    <InputText id="lname" type="text" required placeholder="Update last name"
+                               class="form-control" @bind-Value="selectedUser.LastName" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Status:</label>
+                    <InputText id="lname" type="text" required placeholder="Update status"
+                               class="form-control" @bind-Value="selectedUser.Status" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Role:</label>
+                    <InputText id="lname" type="text" required placeholder="Update role"
+                               class="form-control" @bind-Value="selectedUser.Role" />
+                </div>
+
+            </div>
+            <div class="row">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </EditForm>
+
+    @if (updateSuccess)
+    {
+        <p>User detailes were updated successfully</p>
+    }
+
+}
+
+@code {
+    private Person selectedUser;
+    private List<Person> users;
+    private bool updateSuccess = false;
+
+
+    protected override void OnInitialized()
+    {
+        users = DBService.GetUsers();
+    }
+
+
+    private void OnUserSelected(ChangeEventArgs e)
+    {
+        var id = int.Parse(e.Value.ToString());
+        selectedUser = DBService.GetUserById(id);
+    }
+
+    private void HandleValidSubmit()
+    {
+        updateSuccess = DBService.UpdateUser(selectedUser);
+    }
+
+}
